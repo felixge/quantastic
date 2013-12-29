@@ -6,64 +6,75 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	pkgurl "net/url"
+	_url "net/url"
 	"strings"
 	"time"
 )
+
+// @TODO make sure passing "nil" for any query argument works
 
 const (
 	maxResponseBody = 2 * 1024 * 1024
 	dateFormat      = "2006-01-02"
 )
 
-func NewMite(url, apiKey string) (*Mite, error) {
-	parsedUrl, err := pkgurl.Parse(url)
+func NewClient(url, apiKey string) (*Client, error) {
+	parsedUrl, err := _url.Parse(url)
 	if err != nil {
 		return nil, err
 	}
-	return &Mite{url: *parsedUrl, apiKey: apiKey}, nil
+	return &Client{url: *parsedUrl, apiKey: apiKey}, nil
 }
 
-type Mite struct {
-	url    pkgurl.URL
+type Client struct {
+	url    _url.URL
 	apiKey string
 }
 
-// http://mite.yo.lk/en/api/time-entries.html
-func (m *Mite) TimeEntries(query *TimeEntriesQuery) ([]TimeEntry, error) {
-	url := m.url
-	url.Path = "/time_entries.xml"
+func (c *Client) get(path string, query _url.Values, root interface{}) error {
+	url := c.url
+	url.Path = path
 	if query != nil {
-		url.RawQuery = query.query.Encode()
+		url.RawQuery = query.Encode()
 	}
 
 	req, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	req.Header.Set("X-MiteApiKey", m.apiKey)
+	req.Header.Set("X-MiteApiKey", c.apiKey)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(io.LimitReader(res.Body, maxResponseBody))
-	if err != nil {
-		return nil, err
-	}
-	entries := timeEntries{}
-	if err := xml.Unmarshal(body, &entries); err != nil {
-		errs := errors{}
-		if err2 := xml.Unmarshal(body, &errs); err2 == nil {
-			return nil, fmt.Errorf(strings.Join(errs.Errors, ", "))
+	if err := xml.Unmarshal(body, root); err != nil {
+		root := errorsRoot{}
+		if err := xml.Unmarshal(body, &root); err == nil {
+			return fmt.Errorf(strings.Join(root.Errors, ", "))
 		}
+		return err
+	}
+	return nil
+}
+
+// http://mite.yo.lk/en/api/time-entries.html
+func (c *Client) TimeEntries(query *TimeEntriesQuery) ([]TimeEntry, error) {
+	var q _url.Values
+	if query != nil {
+		q = query.query
+	}
+
+	root := timeEntriesRoot{}
+	if err := c.get("/time_entries.xml", q, &root); err != nil {
 		return nil, err
 	}
 
-	results := make([]TimeEntry, len(entries.Entries))
-	for i, entry := range entries.Entries {
+	results := make([]TimeEntry, len(root.Entries))
+	for i, entry := range root.Entries {
 		results[i] = entry.TimeEntry
 		results[i].DateAt = time.Time(entry.DateAt)
 	}
@@ -71,12 +82,12 @@ func (m *Mite) TimeEntries(query *TimeEntriesQuery) ([]TimeEntry, error) {
 	return results, nil
 }
 
-type errors struct {
+type errorsRoot struct {
 	XMLName xml.Name `xml:"errors"`
 	Errors  []string `xml:"error"`
 }
 
-type timeEntries struct {
+type timeEntriesRoot struct {
 	XMLName xml.Name    `xml:"time-entries"`
 	Entries []timeEntry `xml:"time-entry"`
 }
@@ -118,11 +129,11 @@ type TimeEntry struct {
 }
 
 func NewTimeEntriesQuery() *TimeEntriesQuery {
-	return &TimeEntriesQuery{query: make(pkgurl.Values)}
+	return &TimeEntriesQuery{query: make(_url.Values)}
 }
 
 type TimeEntriesQuery struct {
-	query pkgurl.Values
+	query _url.Values
 }
 
 func (q *TimeEntriesQuery) SetCustomerId(val int) {
@@ -175,4 +186,55 @@ func boolToStr(val bool) string {
 
 func dateToStr(val time.Time) string {
 	return val.Format(dateFormat)
+}
+
+func (c *Client) Customers(query *CustomersQuery) ([]Customer, error) {
+	var q _url.Values
+	if query != nil {
+		q = query.query
+	}
+
+	root := customersRoot{}
+	if err := c.get("/customers.xml", q, &root); err != nil {
+		return nil, err
+	}
+	return root.Customers, nil
+}
+
+type customersRoot struct {
+	XMLName   xml.Name   `xml:"customers"`
+	Customers []Customer `xml:"customer"`
+}
+
+type Customer struct {
+	Id        int       `xml:"id"`
+	Name      string    `xml:"name"`
+	Note      string    `xml:"note"`
+	Archived  bool      `xml:"archived"`
+	CreatedAt time.Time `xml:"created-at"`
+	UpdatedAt time.Time `xml:"updated-at"`
+
+	// Not implemented yet
+	//<hourly-rate type="integer">0</hourly-rate>
+	//<active-hourly-rate nil="true"></active-hourly-rate>
+}
+
+func NewCustomersQuery() *CustomersQuery {
+	return &CustomersQuery{query: make(_url.Values)}
+}
+
+type CustomersQuery struct {
+	query _url.Values
+}
+
+func (q *CustomersQuery) SetName(val string) {
+	q.query.Set("name", val)
+}
+
+func (q *CustomersQuery) SetLimit(val int) {
+	q.query.Set("limit", intToStr(val))
+}
+
+func (q *CustomersQuery) SetPage(val int) {
+	q.query.Set("page", intToStr(val))
 }

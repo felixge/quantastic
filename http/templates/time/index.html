@@ -1,0 +1,13 @@
+<h2>Time</h2>
+<table>
+  <tr>
+    <th>Category</th>
+    <th>Budget</th>
+  </tr>
+  {{range .}}
+    <tr>
+      <td>{{ .Name }}</td>
+      <td>{{ .Note }}</td>
+    </tr>
+  {{end}}
+</table>
