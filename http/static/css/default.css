@@ -40,22 +40,22 @@ h3{margin: 0.4em 0;}
 h4, li{margin: 0.3em 0;}
 h5{ margin: 0.2em 0; }
 h6{margin: 0.1em 0;}
-header, section > section{margin: 0 auto;}
+header, section > div{margin: 0 auto;}
 /*
  * Paddings
  */
 h1, h2, h3, h4, h5, h6, li, ul, ol{padding: 0;}
 body, html{padding: 0;}
-.wrapper > header{padding: 0 1em;}
-.wrapper > section{padding: 1em 1em 0 1em;}
+body > div > header{padding: 0 1em;}
+body > div > section{padding: 1em 1em 0 1em;}
 /*
  * Heights
  */
-body, html, .wrapper, .wrapper > section{height: 100%;}
+body, html, body > div, body > div > section{height: 100%;}
 /*
  * Widths
  */
-section > section, header{width: 960px;}
+section > div, header{width: 960px;}
 /*
  * List Styles
  */
