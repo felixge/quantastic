@@ -10,7 +10,7 @@ import (
 
 func NewServer(configPath string) (s *Server, err error) {
 	s = &Server{}
-	if err = config.Load("config.xml", &s.Config); err != nil {
+	if err = config.Load(configPath, &s.Config); err != nil {
 		return
 	}
 

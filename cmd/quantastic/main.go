@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	s, err := quantastic.NewServer("config.xml")
+	s, err := quantastic.NewServer("config.yml")
 	if err != nil {
 		fmt.Printf("init error: %s", err)
 		os.Exit(1)

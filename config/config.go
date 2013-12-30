@@ -1,8 +1,12 @@
 package config
 
+// @TODO it is rather annoying that goyaml lowercases field names as this
+// breaks the camelCase convention of Go. It would be nice if we could deal
+// with this in a way that doesn't require yaml tags for multi word fields.
+
 import (
-	"encoding/xml"
 	"io/ioutil"
+	"launchpad.net/goyaml"
 )
 
 func Load(path string, config *Config) error {
@@ -10,7 +14,7 @@ func Load(path string, config *Config) error {
 	if err != nil {
 		return err
 	}
-	return xml.Unmarshal(data, config)
+	return goyaml.Unmarshal(data, config)
 }
 
 type Config struct {
@@ -25,11 +29,11 @@ type Log struct {
 
 type Mite struct {
 	Url    string
-	ApiKey string
+	ApiKey string `yaml:"apiKey"`
 }
 
 type Http struct {
 	Addr         string
-	StaticDir    string
-	TemplatesDir string
+	StaticDir    string `yaml:"staticDir"`
+	TemplatesDir string `yaml:"templatesDir"`
 }
