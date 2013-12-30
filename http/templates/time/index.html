@@ -1,17 +1,13 @@
 <section class="time">
   <section>
     <h2>Time</h2>
-    <table>
-      <tr>
-        <th>Category</th>
-        <th>Budget</th>
-      </tr>
+    <ul>
+
+    </ul>
+    <ol>
       {{range .}}
-        <tr>
-          <td>{{ .Name }}</td>
-          <td>{{ .Note }}</td>
-        </tr>
+      <li>{{ .Name }} {{ .Note }}</li>
       {{end}}
-    </table>
+    </ol>
   </section>
 </section>
