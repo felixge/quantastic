@@ -40,10 +40,10 @@ func (h *Handler) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
 	h.log.Info("%s %s", r.Method, r.URL.String())
 	switch r.URL.Path {
 	case "/":
-		w.Header().Set("Location", h.absoluteUrl("/time/week"))
+		w.Header().Set("Location", h.absoluteUrl("/time/day"))
 		w.WriteHeader(gohttp.StatusSeeOther)
-	case "/time/week":
-		h.serveTimeIndex(w, r)
+	case "/time/day":
+		h.serveTime(w, r)
 	case "/css":
 		h.templates.Render(w, r, "css", nil)
 	default:
@@ -51,7 +51,7 @@ func (h *Handler) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
 	}
 }
 
-func (h *Handler) serveTimeIndex(w gohttp.ResponseWriter, r *gohttp.Request) {
+func (h *Handler) serveTime(w gohttp.ResponseWriter, r *gohttp.Request) {
 	//customers, err := h.mite.Customers(nil)
 	//if err != nil {
 	//h.serveInternalError(w, r, "Could not load customers.", "err=%s", err)
