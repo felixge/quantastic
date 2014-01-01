@@ -34,6 +34,7 @@ type Mite struct {
 
 type Http struct {
 	Addr         string
+	BaseUrl      string `yaml:"baseUrl"`
 	StaticDir    string `yaml:"staticDir"`
 	TemplatesDir string `yaml:"templatesDir"`
 }

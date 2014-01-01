@@ -3,19 +3,15 @@ package quantastic
 import (
 	"github.com/felixge/log"
 	"github.com/felixge/quantastic/config"
-	"github.com/felixge/quantastic/http"
-	"github.com/felixge/quantastic/mite"
-	_http "net/http"
+	"github.com/felixge/quantastic/server/http"
+	"github.com/felixge/quantastic/services/mite"
+	gohttp "net/http"
 )
 
-func NewServer(configPath string) (s *Server, err error) {
-	s = &Server{}
-	if err = config.Load(configPath, &s.Config); err != nil {
-		return
-	}
-
+func NewServer(config config.Config) (s *Server, err error) {
+	s = &Server{Config: config}
 	var logLevel log.Level
-	logLevel, err = log.ParseLevel(s.Config.Log.Level)
+	logLevel, err = log.ParseLevel(config.Log.Level)
 	if err != nil {
 		return
 	}
@@ -23,15 +19,16 @@ func NewServer(configPath string) (s *Server, err error) {
 	s.Log = log.NewLogger(log.DefaultConfig)
 	s.Log.Handle(logLevel, log.DefaultWriter)
 
-	s.Mite, err = mite.NewClient(s.Config.Mite.Url, s.Config.Mite.ApiKey)
+	s.Mite, err = mite.NewClient(config.Mite.Url, config.Mite.ApiKey)
 	if err != nil {
 		return
 	}
 	s.Http = http.NewHandler(http.Config{
 		Log:       s.Log,
 		Mite:      s.Mite,
-		Static:    _http.Dir(s.Config.Http.StaticDir),
-		Templates: _http.Dir(s.Config.Http.TemplatesDir),
+		Static:    gohttp.Dir(config.Http.StaticDir),
+		Templates: gohttp.Dir(config.Http.TemplatesDir),
+		BaseUrl:   config.Http.BaseUrl,
 	})
 	return
 }
@@ -47,5 +44,5 @@ func (s *Server) Run() error {
 	defer s.Log.Flush()
 
 	s.Log.Info("Starting server")
-	return _http.ListenAndServe(s.Config.Http.Addr, s.Http)
+	return gohttp.ListenAndServe(s.Config.Http.Addr, s.Http)
 }

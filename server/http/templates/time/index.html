@@ -1,0 +1,47 @@
+<section class="time">
+  <div>
+    <h2>Time</h2>
+
+    <ol>
+      <li>
+        <span class="category">Work</span>
+        <ol>
+          <li>
+            <span class="category">Thomson Reuters</span>
+          </li>
+          <li>
+            <span class="category">Pro7</span>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <span class="category">Projects</span>
+        <ol>
+          <li>
+            <span class="category">GoDrone</span>
+          </li>
+          <li>
+            <span class="category">Quantastic</span>
+            <ol>
+              <li>
+                <span class="category">Development</span>
+              </li>
+              <li>
+                <span class="category">Marketing</span>
+              </li>
+              <li>
+                <span class="category">Docs</span>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ol>
+
+    <ol>
+      {{range .}}
+      <li data-duration="{{ .Note }}">{{ .Name }} {{ .Note }}</li>
+      {{end}}
+    </ol>
+  </div>
+</section>
