@@ -1,43 +1,62 @@
 /*
+ * To evaluate the impact of style changes you make, use the "/css" test page.
+ *
  * This style sheet is a bit peculiar. Every css property that is modified gets
  * its own section. The idea is that this will reduce duplication, increase
  * consistency and also help with quickly performing tasks like "change font
  * color". So far it seems to be working well.
  *
- * To evaluate the impact of style changes you make, use the "/css" test page.
+ * Do not use px values for anything but the outmost containers.
+ *
  */
 
 /*
-/* Font Families
+ * Font Families
  */
 @import url(http://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:400,300,700);
 body, html{
 	font-family: 'Lato', Arial, sans-serif;
 }
 /*
-/* Font Sizes
+ * Font Sizes
  */
+body{font-size: 1.0em}
 h1{font-size: 2.6em}
-h2{font-size: 1.5em}
-h3{font-size: 1.4em}
-h4{font-size: 1.3em}
-h5{font-size: 1.2em}
-h6{font-size: 1.1em}
-li, p{font-size: 1.0em}
+h2{font-size: 2.0em}
+h3{font-size: 1.5em}
+h4{font-size: 1.4em}
+h5{font-size: 1.3em}
+h6{font-size: 1.2em}
+th{font-size: 1.1em}
 /*
-/* Font Colors
+ * Text Alignment
+ */
+th{text-align: left;}
+/*
+ * Font Colors
  */
 header{color: DarkGrey;}
-section, section.time{color: White;}
+section{color: White;}
 /*
-/* Background Colors
+ * Background Colors
  */
-section.time{background-color: MediumSeaGreen;}
 section{background-color: SteelBlue;}
+/*
+ * Border colors
+ */
+th{border-bottom-color: White;}
+/*
+ * Border Width
+ */
+th{border-bottom-width: 0.15em;}
+/*
+ * Border Style
+ */
+th{border-bottom-style: solid;}
 /*
  * Margins
  */
-body, html{margin: 0;}
+body, html, .hierarchy{margin: 0;}
 h1{margin: 0.60em 0;}
 h2{margin: 0.50em 0;}
 h3{margin: 0.45em 0;}
@@ -45,13 +64,19 @@ h4{margin: 0.40em 0;}
 h5{ margin: 0.35em 0; }
 h6, li, ol, ul{margin: 0.30em 0;}
 header, section > div{margin: 0 auto;}
+td, th{margin: 0 1em 0 0;}
 /*
  * Paddings
  */
-h1, h2, h3, h4, h5, h6, li, ul, ol{padding: 0;}
-body, html{padding: 0;}
+body, html, h1, h2, h3, h4, h5, h6, li, ul, ol{padding: 0;}
 body > div > header{padding: 0 1em;}
 body > div > section{padding: 1em 1em 0 1em;}
+td, th{padding-right: 1em;}
+th{padding-bottom: 0.2em; padding-top: 0.2em}
+/*
+ * Border Spacing
+ */
+table{border-spacing: 0;}
 /*
  * Heights
  */
@@ -64,3 +89,11 @@ section > div, header{width: 960px;}
  * List Styles
  */
 li{list-style: none;}
+/*
+ * After Content
+ */
+.hierarchy > li:not(:last-child):after{content: " » "}
+/*
+ * Display
+ */
+.hierarchy li{display: inline;}
