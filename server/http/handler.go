@@ -2,22 +2,22 @@ package http
 
 import (
 	"github.com/felixge/log"
-	"github.com/felixge/quantastic/services/mite"
+	"github.com/felixge/quantastic/api"
 	gohttp "net/http"
 )
 
 type Config struct {
-	Mite      *mite.Client
+	Log       log.Interface
+	Api       *api.Api
 	Static    gohttp.FileSystem
 	Templates gohttp.FileSystem
-	Log       log.Interface
 	BaseUrl   string
 }
 
 func NewHandler(c Config) *Handler {
 	return &Handler{
 		log:       c.Log,
-		mite:      c.Mite,
+		api:       c.Api,
 		static:    gohttp.FileServer(c.Static),
 		templates: newTemplates(c.Templates, c.Log),
 		baseUrl:   c.BaseUrl,
@@ -26,14 +26,14 @@ func NewHandler(c Config) *Handler {
 
 type Handler struct {
 	log       log.Interface
-	mite      *mite.Client
+	api       *api.Api
 	static    gohttp.Handler
 	templates *templates
 	baseUrl   string
 }
 
 func (h *Handler) absoluteUrl(relativeUrl string) string {
-	return h.baseUrl+relativeUrl
+	return h.baseUrl + relativeUrl
 }
 
 func (h *Handler) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
