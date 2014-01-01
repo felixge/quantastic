@@ -3,6 +3,8 @@
  * its own section. The idea is that this will reduce duplication, increase
  * consistency and also help with quickly performing tasks like "change font
  * color". So far it seems to be working well.
+ *
+ * To evaluate the impact of style changes you make, use the "/css" test page.
  */
 
 /*
@@ -16,30 +18,32 @@ body, html{
 /* Font Sizes
  */
 h1{font-size: 2.6em}
-h2{font-size: 1.6em}
+h2{font-size: 1.5em}
 h3{font-size: 1.4em}
-h4, li{font-size: 1.2em}
-h5{font-size: 1.0em}
-h6{font-size: 1em}
+h4{font-size: 1.3em}
+h5{font-size: 1.2em}
+h6{font-size: 1.1em}
+li, p{font-size: 1.0em}
 /*
 /* Font Colors
  */
-header{color: #aaa;}
-section{color: #fff;}
+header{color: DarkGrey;}
+section, section.time{color: White;}
 /*
-/* Backgrounds
+/* Background Colors
  */
-section.time{background: #41ab6b;}
+section.time{background-color: MediumSeaGreen;}
+section{background-color: SteelBlue;}
 /*
  * Margins
  */
 body, html{margin: 0;}
-h1{margin: 0.6em 0;}
-h2{margin: 0.5em 0;}
-h3{margin: 0.4em 0;}
-h4, li{margin: 0.3em 0;}
-h5{ margin: 0.2em 0; }
-h6{margin: 0.1em 0;}
+h1{margin: 0.60em 0;}
+h2{margin: 0.50em 0;}
+h3{margin: 0.45em 0;}
+h4{margin: 0.40em 0;}
+h5{ margin: 0.35em 0; }
+h6, li, ol, ul{margin: 0.30em 0;}
 header, section > div{margin: 0 auto;}
 /*
  * Paddings

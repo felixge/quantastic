@@ -31,12 +31,14 @@ type Handler struct {
 
 func (h *Handler) ServeHTTP(w _http.ResponseWriter, r *_http.Request) {
 	h.log.Info("%s %s", r.Method, r.URL.String())
-	if r.URL.Path == "/" {
+	switch r.URL.Path {
+	case "/":
 		h.serveTimeIndex(w, r)
-		return
+	case "/css":
+		h.templates.Render(w, r, "css", nil)
+	default:
+		h.static.ServeHTTP(w, r)
 	}
-
-	h.static.ServeHTTP(w, r)
 }
 
 func (h *Handler) serveTimeIndex(w _http.ResponseWriter, r *_http.Request) {
