@@ -1,8 +1,8 @@
 dev:
 	@find \
 		. \
-		-type d \
-		\! -path '*/.git/*' \
+		-type f \
+		\! -path '*/.*' \
 		\! -path '*/static*' \
 		! -path '*/templates*' \
 		| justrun \
