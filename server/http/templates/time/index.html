@@ -1,42 +1,121 @@
 <section class="time">
   <div>
-    <h2>Time</h2>
+    <h2>Day</h2>
 
-    <ol>
-      <li>
-        <span class="category">Work</span>
-        <ol>
-          <li>
-            <span class="category">Thomson Reuters</span>
-          </li>
-          <li>
-            <span class="category">Pro7</span>
-          </li>
-        </ol>
-      </li>
-      <li>
-        <span class="category">Projects</span>
-        <ol>
-          <li>
-            <span class="category">GoDrone</span>
-          </li>
-          <li>
-            <span class="category">Quantastic</span>
-            <ol>
-              <li>
-                <span class="category">Development</span>
-              </li>
-              <li>
-                <span class="category">Marketing</span>
-              </li>
-              <li>
-                <span class="category">Docs</span>
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <h3>Entries</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>Sleep</li>
+            </ul>
+          </td>
+          <td>00:00</td>
+          <td>07:00</td>
+          <td>07:00</td>
+        </tr>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>Shower, Coffee</li>
+            </ul>
+          </td>
+          <td>07:00</td>
+          <td>07:30</td>
+          <td>00:30</td>
+        </tr>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>E-Mail</li>
+            </ul>
+          </td>
+          <td>07:30</td>
+          <td>08:15</td>
+          <td>00:45</td>
+        </tr>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>Work</li>
+              <li>Pro7</li>
+            </ul>
+          </td>
+          <td>08:15</td>
+          <td>10:15</td>
+          <td>02:00</td>
+        </tr>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>Work</li>
+              <li>Thomson Reuters</li>
+            </ul>
+          </td>
+          <td>10:15</td>
+          <td>12:00</td>
+          <td>01:45</td>
+        </tr>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>Lunch</li>
+            </ul>
+          </td>
+          <td>12:00</td>
+          <td>12:15</td>
+          <td>00:15</td>
+        </tr>
+        <tr>
+          <td>
+            <ol class="hierarchy">
+              <li>Work</li>
+              <li>Thomson Reuters</li>
+            </ul>
+          </td>
+          <td>12:15</td>
+          <td>15:38</td>
+          <td>03:23</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Targets</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Actual</th>
+          <th>Target</th>
+          <th>Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sleep</td>
+          <td>07:00</td>
+          <td>08:00</td>
+          <td>-01:00</td>
+        </tr>
+        <tr>
+          <td>Shower, Coffee</td>
+          <td>00:35</td>
+          <td>00:30</td>
+          <td>+00:05</td>
+        </tr>
+      </tbody>
+    </table>
 
     <ol>
       {{range .}}
