@@ -1,4 +1,12 @@
 dev:
-	git ls-files | grep -v -E 'css|html' | justrun -c 'go install github.com/felixge/quantastic/cmd/quantastic && quantastic' -stdin
+	@find \
+		. \
+		-type d \
+		\! -path '*/.git/*' \
+		\! -path '*/static*' \
+		! -path '*/templates*' \
+		| justrun \
+			-c 'go install github.com/felixge/quantastic/cmd/quantastic && quantastic' \
+			-stdin
 
 .PHONY: dev
