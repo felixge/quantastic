@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/felixge/log"
+	"github.com/felixge/quantastic/server/http/helpers"
 	"github.com/tav/golly/httputil"
 	"html/template"
 	"io/ioutil"
@@ -27,6 +28,7 @@ func (t *templates) Render(w _http.ResponseWriter, r *_http.Request, path string
 	path += ext
 
 	tmpl := template.New("content")
+	tmpl.Funcs(helpers.Helpers)
 	if err := t.load(tmpl, path); err != nil {
 		t.renderCouldNotLoadTemplate(w, err, path)
 		return
