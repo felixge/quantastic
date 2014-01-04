@@ -1,37 +1,16 @@
+{{define "chain"}}
+  <ol class="hierarchy">
+    {{range .Chain}}
+      {{if not .Root}}
+        <li>{{ .Name }}</li>
+      {{end}}
+    {{end}}
+  </ol>
+{{end}}
+
 <section class="time">
   <div>
     <h2>Day</h2>
-
-    <h3>Categories</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Actual</th>
-          <th>Target</th>
-          <th>Difference</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{range .Root.All}}
-          {{if gt .AllDuration 0}}
-            <tr>
-              <td>
-                <ol class="hierarchy">
-                  {{range .Chain}}
-                    <li>{{ .Name }}</li>
-                  {{end}}
-                </ol>
-              </td>
-              <td>{{ duration .AllDuration }}</td>
-              <td>{{ duration 0 }}</td>
-              <td>{{ duration 0 }}</td>
-            </tr>
-          {{end}}
-        {{end}}
-      </tbody>
-    </table>
 
     <h3>Entries</h3>
 
@@ -47,17 +26,36 @@
       <tbody>
         {{range .Entries}}
           <tr>
-            <td>
-              <ol class="hierarchy">
-                {{ range .Category.Parents }}
-                <li>{{ .Name }}</li>
-                {{end}}
-              </ol>
-            </td>
+            <td>{{template "chain" .Category}}</td>
             <td>{{ time .From }}</td>
             <td>{{ time .To }}</td>
             <td>{{ duration .Duration }}</td>
           </tr>
+        {{end}}
+      </tbody>
+    </table>
+
+    <h3>Categories</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Actual</th>
+          <th>Target</th>
+          <th>Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Root.All}}
+          {{if and (not .Root) (gt .AllDuration 0)}}
+            <tr>
+              <td>{{template "chain" .}}</td>
+              <td>{{ duration .AllDuration }}</td>
+              <td>{{ duration 0 }}</td>
+              <td>{{ duration 0 }}</td>
+            </tr>
+          {{end}}
         {{end}}
       </tbody>
     </table>
