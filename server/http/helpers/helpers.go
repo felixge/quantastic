@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var Helpers = map[string]interface{} {
+var Helpers = map[string]interface{}{
 	"duration": func(val time.Duration) string {
 		minutes := int(val.Minutes())
 		hours := minutes / 60

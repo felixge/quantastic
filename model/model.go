@@ -11,13 +11,13 @@ import (
 )
 
 type TimeEntry struct {
-	Id           string
+	Id       string
 	Category *TimeCategory
-	Note         string
-	Created      time.Time
-	From         time.Time
-	To           time.Time
-	Duration     time.Duration
+	Note     string
+	Created  time.Time
+	From     time.Time
+	To       time.Time
+	Duration time.Duration
 }
 
 type TimeCategory struct {

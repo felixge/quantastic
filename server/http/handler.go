@@ -68,7 +68,7 @@ func (h *Handler) serveTime(w gohttp.ResponseWriter, r *gohttp.Request) {
 	}
 
 	h.templates.Render(w, r, "time/index", map[string]interface{}{
-		"Entries": entries,
+		"Entries":    entries,
 		"Categories": categories,
 	})
 }
