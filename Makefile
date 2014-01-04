@@ -6,7 +6,7 @@ dev:
 		\! -path '*/static*' \
 		\! -path '*/templates*' \
 		| justrun \
-			-c 'go build -o quantastic github.com/felixge/quantastic/cmd/server && ./quantastic' \
+			-c 'go install github.com/felixge/quantastic/cmd/quantastic && quantastic' \
 			-stdin
 
 .PHONY: dev
