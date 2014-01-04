@@ -2,6 +2,37 @@
   <div>
     <h2>Day</h2>
 
+    <h3>Categories</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Actual</th>
+          <th>Target</th>
+          <th>Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Categories}}
+          {{range .Categories}}
+          <tr>
+            <td>
+              <ol class="hierarchy">
+                {{range .Hierarchy}}
+                  <li>{{ .Name }}</li>
+                {{end}}
+              </ol>
+            </td>
+            <td>07:00</td>
+            <td>08:00</td>
+            <td>-01:00</td>
+          </tr>
+          {{end}}
+        {{end}}
+      </tbody>
+    </table>
+
     <h3>Entries</h3>
 
     <table>
@@ -14,113 +45,21 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>Sleep</li>
-            </ul>
-          </td>
-          <td>00:00</td>
-          <td>07:00</td>
-          <td>07:00</td>
-        </tr>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>Shower, Coffee</li>
-            </ul>
-          </td>
-          <td>07:00</td>
-          <td>07:30</td>
-          <td>00:30</td>
-        </tr>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>E-Mail</li>
-            </ul>
-          </td>
-          <td>07:30</td>
-          <td>08:15</td>
-          <td>00:45</td>
-        </tr>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>Work</li>
-              <li>Pro7</li>
-            </ul>
-          </td>
-          <td>08:15</td>
-          <td>10:15</td>
-          <td>02:00</td>
-        </tr>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>Work</li>
-              <li>Thomson Reuters</li>
-            </ul>
-          </td>
-          <td>10:15</td>
-          <td>12:00</td>
-          <td>01:45</td>
-        </tr>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>Lunch</li>
-            </ul>
-          </td>
-          <td>12:00</td>
-          <td>12:15</td>
-          <td>00:15</td>
-        </tr>
-        <tr>
-          <td>
-            <ol class="hierarchy">
-              <li>Work</li>
-              <li>Thomson Reuters</li>
-            </ul>
-          </td>
-          <td>12:15</td>
-          <td>15:38</td>
-          <td>03:23</td>
-        </tr>
+        {{range .Entries}}
+          <tr>
+            <td>
+              <ol class="hierarchy">
+                {{ range .Category.Parents }}
+                <li>{{ .Name }}</li>
+                {{end}}
+              </ol>
+            </td>
+            <td>{{ time .From }}</td>
+            <td>{{ time .To }}</td>
+            <td>{{ duration .Duration }}</td>
+          </tr>
+        {{end}}
       </tbody>
     </table>
-
-    <h3>Targets</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Actual</th>
-          <th>Target</th>
-          <th>Difference</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Sleep</td>
-          <td>07:00</td>
-          <td>08:00</td>
-          <td>-01:00</td>
-        </tr>
-        <tr>
-          <td>Shower, Coffee</td>
-          <td>00:35</td>
-          <td>00:30</td>
-          <td>+00:05</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <ol>
-      {{range .}}
-      <li data-duration="{{ .Note }}">{{ .Name }} {{ .Note }}</li>
-      {{end}}
-    </ol>
   </div>
 </section>

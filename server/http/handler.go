@@ -4,6 +4,7 @@ import (
 	"github.com/felixge/log"
 	"github.com/felixge/quantastic/api"
 	gohttp "net/http"
+	"time"
 )
 
 type Config struct {
@@ -52,19 +53,38 @@ func (h *Handler) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
 }
 
 func (h *Handler) serveTime(w gohttp.ResponseWriter, r *gohttp.Request) {
-	//customers, err := h.mite.Customers(nil)
-	//if err != nil {
-	//h.serveInternalError(w, r, "Could not load customers.", "err=%s", err)
-	//return
-	//}
+	from := dayStart(time.Now())
+	to := dayEnd(time.Now())
+	entries, err := h.api.GetTimeEntries(from, to)
+	if err != nil {
+		h.serveInternalError(w, r, "Could not load customers.", "err=%s", err)
+		return
+	}
 
-	//h.log.Debug("customers: %#v", customers)
-	//h.templates.Render(w, r, "time/index", customers)
-	h.templates.Render(w, r, "time/index", nil)
+	categories, err := h.api.GetTimeCategories(from, to)
+	if err != nil {
+		h.serveInternalError(w, r, "Could not load categories.", "err=%s", err)
+		return
+	}
+
+	h.templates.Render(w, r, "time/index", map[string]interface{}{
+		"Entries": entries,
+		"Categories": categories,
+	})
 }
 
 func (h *Handler) serveInternalError(w gohttp.ResponseWriter, r *gohttp.Request, msg string, details string, args ...interface{}) {
 	logArgs := []interface{}{msg + " " + details}
 	h.log.Error(append(logArgs, args...))
 	h.templates.Render(w, r, "_errors/internal", msg)
+}
+
+func dayStart(day time.Time) time.Time {
+	h, m, s := day.Clock()
+	return day.Add(-(time.Duration(h)*time.Hour + time.Duration(m)*time.Minute + time.Duration(s)*time.Second))
+}
+
+func dayEnd(day time.Time) time.Time {
+	h, m, s := day.Clock()
+	return day.Add((23 - time.Duration(h)*time.Hour) + (59 - time.Duration(m)*time.Minute) + (59 - time.Duration(s)*time.Second))
 }
