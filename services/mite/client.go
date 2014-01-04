@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+// @TODO Move TimeEntries and Customers into own files
+// @TODO Make TimeEntries pointer type
 // @TODO make sure passing "nil" for any query argument works
 
 const (

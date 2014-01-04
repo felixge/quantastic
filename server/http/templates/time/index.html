@@ -14,20 +14,20 @@
         </tr>
       </thead>
       <tbody>
-        {{range .Categories}}
-          {{range .Categories}}
-          <tr>
-            <td>
-              <ol class="hierarchy">
-                {{range .Hierarchy}}
-                  <li>{{ .Name }}</li>
-                {{end}}
-              </ol>
-            </td>
-            <td>07:00</td>
-            <td>08:00</td>
-            <td>-01:00</td>
-          </tr>
+        {{range .Root.All}}
+          {{if gt .AllDuration 0}}
+            <tr>
+              <td>
+                <ol class="hierarchy">
+                  {{range .Chain}}
+                    <li>{{ .Name }}</li>
+                  {{end}}
+                </ol>
+              </td>
+              <td>{{ duration .AllDuration }}</td>
+              <td>{{ duration 0 }}</td>
+              <td>{{ duration 0 }}</td>
+            </tr>
           {{end}}
         {{end}}
       </tbody>

@@ -1,24 +1,24 @@
 package model
 
 import (
-	"github.com/felixge/quantastic/testutil"
+	"github.com/felixge/quantastic/util"
 	"testing"
 )
 
-func TestCategory_Categories(t *testing.T) {
-	root := &Category{
+func TestTimeCategory_All(t *testing.T) {
+	root := &TimeCategory{
 		Name: "A",
-		Children: []*Category{
+		Children: []*TimeCategory{
 			{
 				Name: "B",
-				Children: []*Category{
+				Children: []*TimeCategory{
 					{Name: "C"},
 					{Name: "D"},
 				},
 			},
 			{
 				Name: "E",
-				Children: []*Category{
+				Children: []*TimeCategory{
 					{Name: "F"},
 				},
 			},
@@ -30,20 +30,20 @@ func TestCategory_Categories(t *testing.T) {
 
 	expected := []string{"A", "B", "C", "D", "E", "F", "G"}
 	got := []string{}
-	for _, category := range root.Categories() {
+	for _, category := range root.All() {
 		got = append(got, category.Name)
 	}
-	if err := testutil.DeepEqual(got, expected); err != nil {
+	if err := util.DeepEqual(got, expected); err != nil {
 		t.Error(err)
 	}
 }
 
-func TestCategory_Hierarchy(t *testing.T) {
-	leaf := &Category{
+func TestTimeCategory_Chain(t *testing.T) {
+	leaf := &TimeCategory{
 		Name: "C",
-		Parent: &Category{
+		Parent: &TimeCategory{
 			Name: "B",
-			Parent: &Category{
+			Parent: &TimeCategory{
 				Name: "A",
 			},
 		},
@@ -51,10 +51,10 @@ func TestCategory_Hierarchy(t *testing.T) {
 
 	expected := []string{"A", "B", "C"}
 	got := []string{}
-	for _, category := range leaf.Hierarchy() {
+	for _, category := range leaf.Chain() {
 		got = append(got, category.Name)
 	}
-	if err := testutil.DeepEqual(got, expected); err != nil {
+	if err := util.DeepEqual(got, expected); err != nil {
 		t.Error(err)
 	}
 }

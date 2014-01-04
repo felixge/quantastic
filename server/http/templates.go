@@ -10,6 +10,8 @@ import (
 	_http "net/http"
 )
 
+// @TODO decouple this from http and move into own pkg
+
 var extensions = map[string]string{
 	"text/html": ".html",
 }
