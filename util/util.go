@@ -8,6 +8,11 @@ import (
 	"reflect"
 )
 
+// Sdump returns a deep printed string dump of the values passed in.
+func Sdump(vals ...interface{}) string {
+	return spew.Sdump(vals...)
+}
+
 // DeepEqual performs a deep comparison between got and expected, and returns
 // an error if they are different. It's a placeholder function until I find or
 // create a pkg that performs this task and returns a more detailed diff.
