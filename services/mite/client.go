@@ -111,7 +111,7 @@ func (d *date) UnmarshalText(text []byte) error {
 type TimeEntry struct {
 	Id           int       `xml:"id"`
 	DateAt       time.Time `xml:"date-at"`
-	Minutes      string    `xml:"minutes"`
+	Minutes      int       `xml:"minutes"`
 	Revenue      float64   `xml:"revenue"`
 	Billable     bool      `xml:"billable"`
 	Note         string    `xml:"note"`
