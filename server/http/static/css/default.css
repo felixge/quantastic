@@ -56,7 +56,7 @@ th{border-bottom-style: solid;}
 /*
  * Margins
  */
-body, html, .hierarchy{margin: 0;}
+body, html, .chain{margin: 0;}
 h1{margin: 0.60em 0;}
 h2{margin: 0.50em 0;}
 h3{margin: 0.45em 0;}
@@ -92,8 +92,8 @@ li{list-style: none;}
 /*
  * After Content
  */
-.hierarchy > li:not(:last-child):after{content: " » "}
+.chain > li:not(:last-child):after{content: " » "}
 /*
  * Display
  */
-.hierarchy li{display: inline;}
+.chain li{display: inline;}
