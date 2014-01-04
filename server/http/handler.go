@@ -55,7 +55,6 @@ func (h *Handler) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
 
 func (h *Handler) serveTime(w gohttp.ResponseWriter, r *gohttp.Request) {
 	timeRange := model.Day(time.Now())
-	timeRange.Start = timeRange.End.Add(-7 * 24 * time.Hour)
 	if err := h.api.ReadTimeRange(timeRange); err != nil {
 		h.serveInternalError(w, r, "Could not read time range.", "err=%s", err)
 		return
