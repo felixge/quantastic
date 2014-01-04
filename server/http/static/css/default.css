@@ -80,7 +80,7 @@ table{border-spacing: 0;}
 /*
  * Heights
  */
-body, html, body > div, body > div > section{height: 100%;}
+body, html, body > div, body > div > section{min-height: 100%;}
 /*
  * Widths
  */
