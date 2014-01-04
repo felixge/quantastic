@@ -1,5 +1,7 @@
-// Package testuil contains helper methods for testing.
-package testutil
+// Package util contains helper functions that haven't found a better home yet.
+// Methods from this pkg should always be moved to more appropiate places over
+// time.
+package util
 
 import (
 	"github.com/davecgh/go-spew/spew"
