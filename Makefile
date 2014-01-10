@@ -1,4 +1,5 @@
 dev:
+	@killall quantastic
 	@find \
 		. \
 		-type f \
