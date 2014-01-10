@@ -35,24 +35,27 @@ th{text-align: left;}
 /*
  * Font Colors
  */
-header{color: DarkGrey;}
-section{color: White;}
+header{color: White;}
+section{color: #444;}
 /*
  * Background Colors
  */
-section{background-color: SteelBlue;}
+header{background-color: SteelBlue;}
 /*
  * Border colors
  */
 th{border-bottom-color: White;}
+input{border: #ccc;}
 /*
  * Border Width
  */
 th{border-bottom-width: 0.15em;}
+input{border-width: 0.15em;}
 /*
  * Border Style
  */
 th{border-bottom-style: solid;}
+input{border-style: solid;}
 /*
  * Margins
  */
@@ -63,16 +66,16 @@ h3{margin: 0.45em 0;}
 h4{margin: 0.40em 0;}
 h5{ margin: 0.35em 0; }
 h6, li, ol, ul{margin: 0.30em 0;}
-header, section > div{margin: 0 auto;}
+header > h1, section > div{margin: 0 auto;}
 td, th{margin: 0 1em 0 0;}
 /*
  * Paddings
  */
 body, html, h1, h2, h3, h4, h5, h6, li, ul, ol{padding: 0;}
-body > div > header{padding: 0 1em;}
-body > div > section{padding: 1em 1em 0 1em;}
+body > div > section, header{padding: 1em;}
 td, th{padding-right: 1em;}
 th{padding-bottom: 0.2em; padding-top: 0.2em}
+input{padding: 0.5em;}
 /*
  * Border Spacing
  */
@@ -84,7 +87,7 @@ body, html, body > div, body > div > section{min-height: 100%;}
 /*
  * Widths
  */
-section > div, header{width: 960px;}
+section > div, header > h1{width: 960px;}
 /*
  * List Styles
  */
@@ -97,3 +100,7 @@ li{list-style: none;}
  * Display
  */
 .chain li{display: inline;}
+/*
+ * Outline
+ */
+*:focus {outline: 0;}
