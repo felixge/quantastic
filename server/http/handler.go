@@ -46,6 +46,8 @@ func (h *Handler) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
 		w.WriteHeader(gohttp.StatusSeeOther)
 	case "/time/day":
 		h.serveTime(w, r)
+	case "/prototype":
+		h.templates.Render(w, r, "prototype", nil)
 	case "/css":
 		h.templates.Render(w, r, "css", nil)
 	default:
