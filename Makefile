@@ -1,3 +1,6 @@
+client:
+	@make -C client
+
 dev:
 	@killall quantastic
 	@find \
@@ -10,4 +13,4 @@ dev:
 			-c 'go install github.com/felixge/quantastic/cmd/quantastic && quantastic' \
 			-stdin
 
-.PHONY: dev
+.PHONY: client dev
