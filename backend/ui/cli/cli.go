@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"github.com/felixge/quantastic/backend/handlers"
+	"github.com/felixge/quantastic/backend/app"
 	"io"
 )
 
@@ -21,7 +21,7 @@ type CLI struct {
 	stdout, stderr io.Writer
 	quit           chan error
 	args           []string
-	handlers       []interface{}
+	app       []interface{}
 }
 
 // @TODO really make this a loop / support interactive mode
@@ -34,10 +34,10 @@ func (c *CLI) loop() {
 }
 
 func (c *CLI) dispatch(request interface{}) error {
-	for _, handler := range c.handlers {
+	for _, handler := range c.app {
 		switch r := request.(type) {
 		case getVersionRequest:
-			if h, ok := handler.(handlers.GetVersionHandler); ok {
+			if h, ok := handler.(app.GetVersionHandler); ok {
 				response := h.GetVersion(r)
 				fmt.Fprintf(c.stdout, "%s\n", response.Version())
 				return nil
@@ -53,7 +53,7 @@ func (c *CLI) printError(err error) {
 
 // @TODO Panic if an existing handler implements the same interface already.
 func (c *CLI) AddHandler(handler interface{}) {
-	c.handlers = append(c.handlers, handler)
+	c.app = append(c.app, handler)
 }
 
 func (c *CLI) Wait() error {
