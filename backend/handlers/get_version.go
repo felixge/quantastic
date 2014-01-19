@@ -16,6 +16,8 @@ func (h GetVersionHandler) GetVersion(req GetVersionRequest) GetVersionResponse 
 	return h.response
 }
 
+type GetVersionRequest interface{}
+
 type GetVersionResponse struct {
 	version version.Version
 }
@@ -23,5 +25,3 @@ type GetVersionResponse struct {
 func (res GetVersionResponse) Version() version.Version {
 	return res.version
 }
-
-type GetVersionRequest interface{}
