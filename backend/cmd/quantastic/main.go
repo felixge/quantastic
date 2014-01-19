@@ -1,36 +1,24 @@
-// Command quantastic implements the quantastic server.
-
+// Command quantastic implements the quantastic backend.
 package main
 
-// @TODO -h/--help flag to print usage
-// @TODO -v/--version flag to print version
-
 import (
-	"flag"
-	"fmt"
-	pkgconfig "github.com/felixge/quantastic/config"
+	"github.com/felixge/quantastic/backend/ui/cli"
+	"github.com/felixge/quantastic/backend/handlers"
+	"github.com/felixge/quantastic/backend/version"
 	"os"
 )
 
+// populated by the build system
+var (
+	buildRelease string
+	buildCommit  string
+)
+
 func main() {
-	var (
-		configPath = flag.Arg(0)
-		config     pkgconfig.Server
-	)
-	if configPath == "" {
-		configPath = "config.yml"
-	}
-	if err := pkgconfig.Load(configPath, &config); err != nil {
-		fmt.Printf("Could not load config. path=%s err=%s", configPath, err)
-		os.Exit(1)
-	}
-	s, err := pkgconfig.NewServer(config)
-	if err != nil {
-		fmt.Printf("Could not create server. err=%s", err)
-		os.Exit(1)
-	}
-	if err := s.Run(); err != nil {
-		fmt.Printf("System failure. err=%s", err)
+	buildVersion := version.NewVersion(buildRelease, buildCommit)
+	cliUI := cli.NewCLI(os.Stdout, os.Stderr, os.Args[1:])
+	cliUI.AddHandler(handlers.NewGetVersion(buildVersion))
+	if err := cliUI.Wait(); err != nil {
 		os.Exit(1)
 	}
 }
