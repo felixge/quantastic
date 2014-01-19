@@ -26,11 +26,31 @@ type CLI struct {
 
 // @TODO really make this a loop / support interactive mode
 func (c *CLI) loop() {
-	err := c.dispatch(getVersionRequest{})
+	r, err := c.parseRequest(c.args)
+	if err == nil {
+		if r == nil {
+			fmt.Fprintf(c.stdout, "@TODO: Show usage\n")
+		} else {
+			err = c.dispatch(r)
+		}
+	}
 	if err != nil {
 		c.printError(err)
 	}
 	c.quit <- err
+}
+
+func (c *CLI) parseRequest(args []string) (interface{}, error) {
+	if len(args) == 0 {
+		return nil, nil
+	}
+
+	switch cmd := args[0]; cmd {
+	case "-v", "--version", "version":
+		return getVersionRequest{}, nil
+	default:
+		return nil, fmt.Errorf("Unknown command: %s", cmd)
+	}
 }
 
 func (c *CLI) dispatch(request interface{}) error {
