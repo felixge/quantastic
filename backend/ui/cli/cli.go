@@ -37,7 +37,7 @@ func (c *CLI) dispatch(request interface{}) error {
 	for _, handler := range c.handlers {
 		switch r := request.(type) {
 		case getVersionRequest:
-			if h, ok := handler.(handlers.GetVersion); ok {
+			if h, ok := handler.(handlers.GetVersionHandler); ok {
 				response := h.GetVersion(r)
 				fmt.Fprintf(c.stdout, "%s\n", response.Version())
 				return nil

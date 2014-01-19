@@ -4,32 +4,24 @@ import (
 	"github.com/felixge/quantastic/backend/version"
 )
 
-func NewGetVersion(version version.Version) GetVersion {
-	return getVersionHandler{getVersionResponse{version}}
+func NewGetVersionHandler(version version.Version) GetVersionHandler {
+	return GetVersionHandler{GetVersionResponse{version}}
 }
 
-type getVersionHandler struct {
-	response getVersionResponse
+type GetVersionHandler struct {
+	response GetVersionResponse
 }
 
-func (h getVersionHandler) GetVersion(req GetVersionRequest) GetVersionResponse {
+func (h GetVersionHandler) GetVersion(req GetVersionRequest) GetVersionResponse {
 	return h.response
 }
 
-type getVersionResponse struct {
+type GetVersionResponse struct {
 	version version.Version
 }
 
-func (res getVersionResponse) Version() version.Version {
+func (res GetVersionResponse) Version() version.Version {
 	return res.version
 }
 
-type GetVersion interface {
-	GetVersion(GetVersionRequest) GetVersionResponse
-}
-
 type GetVersionRequest interface{}
-
-type GetVersionResponse interface {
-	Version() version.Version
-}

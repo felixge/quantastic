@@ -17,7 +17,7 @@ var (
 func main() {
 	buildVersion := version.NewVersion(buildRelease, buildCommit)
 	cliUI := cli.NewCLI(os.Stdout, os.Stderr, os.Args[1:])
-	cliUI.AddHandler(handlers.NewGetVersion(buildVersion))
+	cliUI.AddHandler(handlers.NewGetVersionHandler(buildVersion))
 	if err := cliUI.Wait(); err != nil {
 		os.Exit(1)
 	}
