@@ -2,8 +2,8 @@
 package main
 
 import (
+	"github.com/felixge/quantastic/backend/ui/cli"
 	"github.com/felixge/quantastic/backend/app"
-	"github.com/felixge/quantastic/backend/ui/text"
 	"github.com/felixge/quantastic/backend/version"
 	"os"
 )
@@ -16,9 +16,9 @@ var (
 
 func main() {
 	buildVersion := version.NewVersion(buildRelease, buildCommit)
-	textUI := text.NewTextUI(os.Stdout, os.Stderr, os.Args[1:])
-	textUI.AddHandler(app.NewGetVersionHandler(buildVersion))
-	if err := textUI.Wait(); err != nil {
+	cliUI := cli.NewCLI(os.Stdout, os.Stderr, os.Args[1:])
+	cliUI.AddHandler(app.NewGetVersionHandler(buildVersion))
+	if err := cliUI.Wait(); err != nil {
 		os.Exit(1)
 	}
 }
