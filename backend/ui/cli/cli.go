@@ -3,15 +3,17 @@ package cli
 import (
 	"fmt"
 	"github.com/felixge/quantastic/backend/app"
+	"github.com/felixge/quantastic/backend/ui/cli/commands"
 	"io"
 )
 
 func NewCLI(stdout, stderr io.Writer, args []string) *CLI {
 	c := &CLI{
-		stdout: stdout,
-		stderr: stderr,
-		args:   args,
-		quit:   make(chan error),
+		stdout:   stdout,
+		stderr:   stderr,
+		args:     args,
+		quit:     make(chan error),
+		commands: commands.Commands,
 	}
 	go c.loop()
 	return c
@@ -21,7 +23,8 @@ type CLI struct {
 	stdout, stderr io.Writer
 	quit           chan error
 	args           []string
-	app            []interface{}
+	handlers       []interface{}
+	commands       []commands.Command
 }
 
 // @TODO really make this a loop / support interactive mode
@@ -48,13 +51,15 @@ func (c *CLI) parseRequest(args []string) (interface{}, error) {
 	switch cmd := args[0]; cmd {
 	case "-v", "--version", "version":
 		return getVersionRequest{}, nil
+	case "time":
+		return getVersionRequest{}, nil
 	default:
 		return nil, fmt.Errorf("Unknown command: %s", cmd)
 	}
 }
 
 func (c *CLI) dispatch(request interface{}) error {
-	for _, handler := range c.app {
+	for _, handler := range c.handlers {
 		switch r := request.(type) {
 		case getVersionRequest:
 			if h, ok := handler.(app.GetVersionHandler); ok {
@@ -73,7 +78,7 @@ func (c *CLI) printError(err error) {
 
 // @TODO Panic if an existing handler implements the same interface already.
 func (c *CLI) AddHandler(handler interface{}) {
-	c.app = append(c.app, handler)
+	c.handlers = append(c.handlers, handler)
 }
 
 func (c *CLI) Wait() error {
