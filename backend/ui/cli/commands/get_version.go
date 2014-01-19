@@ -1,5 +1,4 @@
 package commands
 
-type GetVersion struct{
-
+type GetVersion struct {
 }

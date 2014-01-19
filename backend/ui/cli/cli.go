@@ -21,7 +21,7 @@ type CLI struct {
 	stdout, stderr io.Writer
 	quit           chan error
 	args           []string
-	app       []interface{}
+	app            []interface{}
 }
 
 // @TODO really make this a loop / support interactive mode

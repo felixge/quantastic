@@ -2,8 +2,8 @@
 package main
 
 import (
-	"github.com/felixge/quantastic/backend/ui/cli"
 	"github.com/felixge/quantastic/backend/app"
+	"github.com/felixge/quantastic/backend/ui/cli"
 	"github.com/felixge/quantastic/backend/version"
 	"os"
 )
