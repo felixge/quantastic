@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// @TODO Add time, os, go version, etc.
+// @TODO Add time, os, go version, build number, etc.
 func NewVersion(release, commit string) Version {
 	return Version{release, commit}
 }
