@@ -1,4 +1,4 @@
-package cli
+package text
 
 import (
 	"fmt"
@@ -6,40 +6,40 @@ import (
 	"io"
 )
 
-func NewCLI(stdout, stderr io.Writer, args []string) *CLI {
-	c := &CLI{
+func NewTextUI(stdout, stderr io.Writer, args []string) *TextUI {
+	u := &TextUI{
 		stdout: stdout,
 		stderr: stderr,
 		args:   args,
 		quit:   make(chan error),
 	}
-	go c.loop()
-	return c
+	go u.loop()
+	return u
 }
 
-type CLI struct {
+type TextUI struct {
 	stdout, stderr io.Writer
 	quit           chan error
 	args           []string
-	app       []interface{}
+	handlers       []interface{}
 }
 
 // @TODO really make this a loop / support interactive mode
-func (c *CLI) loop() {
-	err := c.dispatch(getVersionRequest{})
+func (u *TextUI) loop() {
+	err := u.dispatch(getVersionRequest{})
 	if err != nil {
-		c.printError(err)
+		u.printError(err)
 	}
-	c.quit <- err
+	u.quit <- err
 }
 
-func (c *CLI) dispatch(request interface{}) error {
-	for _, handler := range c.app {
+func (u *TextUI) dispatch(request interface{}) error {
+	for _, handler := range u.handlers {
 		switch r := request.(type) {
 		case getVersionRequest:
 			if h, ok := handler.(app.GetVersionHandler); ok {
 				response := h.GetVersion(r)
-				fmt.Fprintf(c.stdout, "%s\n", response.Version())
+				fmt.Fprintf(u.stdout, "%s\n", response.Version())
 				return nil
 			}
 		}
@@ -47,17 +47,17 @@ func (c *CLI) dispatch(request interface{}) error {
 	return fmt.Errorf("Could not find handler for: %#v", request)
 }
 
-func (c *CLI) printError(err error) {
-	fmt.Fprintf(c.stderr, "Error: %s\n", err)
+func (u *TextUI) printError(err error) {
+	fmt.Fprintf(u.stderr, "Error: %s\n", err)
 }
 
 // @TODO Panic if an existing handler implements the same interface already.
-func (c *CLI) AddHandler(handler interface{}) {
-	c.app = append(c.app, handler)
+func (u *TextUI) AddHandler(handler interface{}) {
+	u.handlers = append(u.handlers, handler)
 }
 
-func (c *CLI) Wait() error {
-	return <-c.quit
+func (u *TextUI) Wait() error {
+	return <-u.quit
 }
 
 type getVersionRequest struct{}
