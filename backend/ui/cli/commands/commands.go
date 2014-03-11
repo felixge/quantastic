@@ -1,9 +1,9 @@
 package commands
 
-func NewFlag(longName, shortName string) {
-}
+//func NewFlag(longName, shortName string) {
+//}
 
-NewFlag("version", "v")
+//NewFlag("version", "v")
 
 type Flag struct{}
 
