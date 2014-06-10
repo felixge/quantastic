@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"crypto/rand"
@@ -152,7 +152,7 @@ func (t *TimeEntry) Valid() error {
 
 func (t *TimeEntry) Duration() time.Duration{
 	if t.End == nil {
-		return UtcNow().Sub(t.Start)
+		return time.Now().Sub(t.Start)
 	} else {
 		return t.End.Sub(t.Start)
 	}

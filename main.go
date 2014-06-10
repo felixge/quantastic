@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/felixge/quantastic/db"
 )
 
 var commands = []*command{
@@ -51,7 +52,7 @@ outer:
 			}
 		}
 		args = args[len(cmdParts):]
-		db, err := OpenDb(filepath.Join(os.Getenv("HOME"), ".quantastic"))
+		db, err := db.OpenDb(filepath.Join(os.Getenv("HOME"), ".quantastic"))
 		if err != nil {
 			fatal("Could not open db: %s", err)
 		}

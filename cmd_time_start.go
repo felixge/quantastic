@@ -2,6 +2,7 @@ package main
 
 import (
 	"time"
+	"github.com/felixge/quantastic/db"
 )
 
 var cmdTimeStart = &command{
@@ -19,7 +20,7 @@ func cmdTimeStartFn(c *Context) {
 	activeEntry, err := c.Db.ActiveTimeEntry()
 	now := time.Now()
 	if err != nil {
-		if _, ok := err.(NotFoundError); !ok {
+		if _, ok := err.(db.NotFoundError); !ok {
 			fatal("Failed to get latest entry: %s", err)
 		}
 	} else {
@@ -28,7 +29,7 @@ func cmdTimeStartFn(c *Context) {
 			fatal("Failed to set end for active entry: %s", err)
 		}
 	}
-	entry := &TimeEntry{
+	entry := &db.TimeEntry{
 		Category: category,
 		Start:    now,
 	}
