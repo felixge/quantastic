@@ -36,6 +36,7 @@ type Db struct {
 	timeEntries map[string]*TimeEntry
 }
 
+
 func (d *Db) TimeEntry(id string) (*TimeEntry, error) {
 	entry, ok := d.timeEntries[id]
 	if !ok {

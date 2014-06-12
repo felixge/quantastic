@@ -1,5 +1,9 @@
 package main
 
+import (
+	"time"
+)
+
 var cmdTimeEnd = &command{
 	name:        "time end",
 	description: "Finish an entry.",
@@ -15,7 +19,7 @@ func cmdTimeEndFn(c *Context) {
 	if entry.End != nil {
 		fatal("Latest entry is already finished.")
 	}
-	now := UtcNow()
+	now := time.Now()
 	entry.End = &now
 	if err := c.Db.SaveTimeEntry(entry); err != nil {
 		fatal("Could not save entry: %s", err)
