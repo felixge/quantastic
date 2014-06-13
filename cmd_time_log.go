@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"time"
@@ -18,11 +19,13 @@ func cmdTimeLogFn(c *Context) {
 	if err != nil {
 		fatal("Could not get entries: %s", err)
 	}
+	options := [][]string{}
 	if sinceStr, ok := flag("since", c.Args); ok {
 		since, err := StringToTime(sinceStr)
 		if err != nil {
 			fatal("Invalid since value: %s", err)
 		}
+		options = append(options, []string{"SINCE:", TimeToString(&since)})
 		for i, entry := range entries {
 			if entry.Start.Before(since) {
 				entries = entries[0:i]
@@ -35,11 +38,18 @@ func cmdTimeLogFn(c *Context) {
 		if err != nil {
 			fatal("Invalid until value: %s", err)
 		}
-		for i, entry := range entries {
-			if entry.Start.After(until) {
-				entries = entries[i:]
+		options = append(options, []string{"UNTIL:", TimeToString(&until)})
+		for len(entries) > 0 {
+			if entries[0].Start.After(until) {
+				entries = entries[1:]
+			} else {
+				break
 			}
 		}
+	}
+	if len(options) > 0 {
+		mustWriteTable(os.Stdout, options)
+		fmt.Fprintf(os.Stdout, "\n")
 	}
 	if ok := boolFlag("group", c.Args); ok {
 		m := map[string]time.Duration{}
