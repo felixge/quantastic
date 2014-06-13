@@ -153,6 +153,8 @@ func mustPrintfStdout(format string, args ...interface{}) {
 	}
 }
 
+// @TODO Get rid of this / other must* stuff for stdout. No sense in handling
+// it.
 func mustWriteTable(w io.Writer, data [][]string) {
 	if err := writeTable(w, data); err != nil {
 		panic(err)
@@ -181,4 +183,10 @@ func boolFlag(flag string, args []string) bool {
 		}
 	}
 	return false
+}
+
+func prefixLines(str string, prefix string) string {
+	str = prefix+str
+	str = strings.Replace(str, "\n", "\n"+prefix, -1)
+	return str
 }

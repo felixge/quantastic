@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"sort"
@@ -74,19 +75,40 @@ func cmdTimeLogFn(c *Context) {
 		return
 	}
 
-	data := make([][]string, 0, len(entries)+1)
-	data = append(data, []string{"CATEGORY", "START", "END", "DURATION", "NOTE", "ID"})
-	for _, entry := range entries {
-		data = append(data, []string{
-			CategoryToString(entry.Category),
-			TimeToString(&entry.Start),
-			TimeToString(entry.End),
-			DurationToString(entry.Duration()),
-			NoteExcerpt(entry.Note),
-			entry.Id,
-		})
+	if ok := boolFlag("table", c.Args); ok {
+		data := make([][]string, 0, len(entries)+1)
+		data = append(data, []string{"CATEGORY", "START", "END", "DURATION", "NOTE", "ID"})
+		for _, entry := range entries {
+			data = append(data, []string{
+				CategoryToString(entry.Category),
+				TimeToString(&entry.Start),
+				TimeToString(entry.End),
+				DurationToString(entry.Duration()),
+				NoteExcerpt(entry.Note),
+				entry.Id,
+			})
+		}
+		mustWriteTable(os.Stdout, data)
+	} else {
+		stdout := bufio.NewWriter(os.Stdout)
+		for i, entry := range entries {
+			if i > 0 {
+				fmt.Fprintf(stdout, "\n")
+			}
+			data := [][]string{
+				[]string{"Id:", entry.Id},
+				[]string{"Category:", CategoryToString(entry.Category)},
+				[]string{"Start:", TimeToString(&entry.Start)},
+				[]string{"End:", TimeToString(entry.End)},
+				[]string{"Duration:", DurationToString(entry.Duration())},
+			}
+			mustWriteTable(stdout, data)
+			if entry.Note != "" {
+				fmt.Fprintf(stdout, "\n%s\n", prefixLines(entry.Note, "    "))
+			}
+		}
+		stdout.Flush()
 	}
-	mustWriteTable(os.Stdout, data)
 }
 
 type groupTimeEntries []*groupTimeEntry
