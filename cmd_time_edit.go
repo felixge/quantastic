@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/felixge/quantastic/db"
 	"io"
 	"io/ioutil"
 	"os"
@@ -14,17 +15,22 @@ import (
 var cmdTimeEdit = &command{
 	name:        "time edit",
 	description: "Edit an entry.",
-	usage:       "<id>",
-	fn:          cmdTimeEditFn,
+	usage: `[<id>]
+
+If <id> is not given, it defaults to the latest entry.`,
+	fn: cmdTimeEditFn,
 }
 
 var fieldRegExp = regexp.MustCompile("^([^:]+):\\s*(.*?)\\s*$")
 
 func cmdTimeEditFn(c *Context) {
+	var entry *db.TimeEntry
+	var err error
 	if len(c.Args) == 0 {
-		fatal("%s", c.Cmd.Usage())
+		entry, err = c.Db.LatestTimeEntry()
+	} else {
+		entry, err = c.Db.TimeEntry(c.Args[0])
 	}
-	entry, err := c.Db.TimeEntry(c.Args[0])
 	if err != nil {
 		fatal("Could not load entry: %s", err)
 	}
