@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
 	"github.com/felixge/quantastic/db"
 )
 
@@ -15,6 +16,7 @@ var commands = []*command{
 	cmdTimeEnd,
 	cmdTimeEdit,
 	cmdTimeRm,
+	cmdTimeInvoice,
 }
 
 func usage() string {

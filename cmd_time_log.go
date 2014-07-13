@@ -6,6 +6,9 @@ import (
 	"os"
 	"sort"
 	"time"
+
+	"github.com/felixge/asciitable"
+	"github.com/felixge/pager"
 )
 
 var cmdTimeLog = &command{
@@ -48,6 +51,11 @@ func cmdTimeLogFn(c *Context) {
 			}
 		}
 	}
+	p, err := pager.Start("less")
+	if err != nil {
+		fatal("Failed to execute pager: %s", err)
+	}
+	defer p.Wait()
 	if len(options) > 0 {
 		mustWriteTable(os.Stdout, options)
 		fmt.Fprintf(os.Stdout, "\n")
@@ -76,19 +84,31 @@ func cmdTimeLogFn(c *Context) {
 	}
 
 	if ok := boolFlag("table", c.Args); ok {
-		data := make([][]string, 0, len(entries)+1)
-		data = append(data, []string{"CATEGORY", "START", "END", "DURATION", "NOTE", "ID"})
+		table := asciitable.NewTable()
+		table.AddRow("Category", "Start", "End", "Duration", "Note", "Id")
+		var total time.Duration
+		var prevDay string
 		for _, entry := range entries {
-			data = append(data, []string{
+			day := entry.Start.Format("2006-01-02")
+			if day != prevDay {
+				table.AddSeparator()
+				table.AddRow("", day, "", "", entry.Start.Format("Monday"))
+				table.AddSeparator()
+			}
+			prevDay = day
+			total += entry.Duration()
+			table.AddRow(
 				CategoryToString(entry.Category),
-				TimeToString(&entry.Start),
-				TimeToString(entry.End),
+				TimeString(&entry.Start),
+				TimeString(entry.End),
 				DurationToString(entry.Duration()),
 				NoteExcerpt(entry.Note),
 				entry.Id,
-			})
+			)
 		}
-		mustWriteTable(os.Stdout, data)
+		table.AddSeparator()
+		table.AddRow("Total", "", "", DurationToString(total), "", "")
+		table.Fprint(os.Stdout)
 	} else {
 		stdout := bufio.NewWriter(os.Stdout)
 		for i, entry := range entries {
@@ -125,7 +145,7 @@ func (entries groupTimeEntries) Less(i, j int) bool {
 	return entries[i].Duration > entries[j].Duration
 }
 
-type groupTimeEntry struct{
+type groupTimeEntry struct {
 	Category string
 	Duration time.Duration
 }

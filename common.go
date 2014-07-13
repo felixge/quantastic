@@ -34,6 +34,25 @@ func CategoryToString(category []string) string {
 	return strings.Join(category, categorySeparator)
 }
 
+func CategoryEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func TimeString(t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	return t.Local().Format("15:04:05")
+}
+
 func TimeToString(t *time.Time) string {
 	if t == nil {
 		return ""
@@ -186,7 +205,7 @@ func boolFlag(flag string, args []string) bool {
 }
 
 func prefixLines(str string, prefix string) string {
-	str = prefix+str
+	str = prefix + str
 	str = strings.Replace(str, "\n", "\n"+prefix, -1)
 	return str
 }
