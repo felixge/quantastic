@@ -3,13 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/felixge/quantastic/db"
 	"io"
-	"io/ioutil"
-	"os"
-	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/felixge/quantastic/db"
 )
 
 var cmdTimeEdit = &command{
@@ -28,52 +26,54 @@ func cmdTimeEditFn(c *Context) {
 	var err error
 	if len(c.Args) == 0 {
 		entry, err = c.Db.LatestTimeEntry()
+	} else if strings.HasPrefix(c.Args[0], "~") {
+		var num int
+		_, err := fmt.Sscanf(c.Args[0], "~%d", &num)
+		if err != nil {
+			fatal("Bad argument: %s", c.Args[0])
+		}
+		entries, err := c.Db.TimeEntriesByStart()
+		if err != nil {
+			fatal("Could not load entries: %s", err)
+		}
+		if num > len(entries) {
+			num = len(entries)
+		}
+		editEntries(c, entries[0:num])
+		return
 	} else {
 		entry, err = c.Db.TimeEntry(c.Args[0])
 	}
 	if err != nil {
 		fatal("Could not load entry: %s", err)
 	}
+	editEntry(c, entry)
+}
+
+func editEntry(c *Context, entry *db.TimeEntry) {
 	table := [][]string{
 		{"CATEGORY:", CategoryToString(entry.Category)},
 		{"START:", TimeToString(&entry.Start)},
 		{"END:", TimeToString(entry.End)},
 	}
-	file, err := ioutil.TempFile("", "time-entry-"+entry.Id)
-	if err != nil {
-		fatal("Could not open tmp file: %s", err)
-	}
-	defer file.Close()
-	defer os.Remove(file.Name())
-
-	err = writeTable(file, table)
+	editor := NewEditor()
+	editor.TmpPrefix = "time-entry-" + entry.Id
+	defer editor.Close()
+	err := writeTable(editor, table)
 	if err == nil {
 		if entry.Note == "" {
-			_, err = fmt.Fprintf(file, "\n# Insert note here\n")
+			_, err = fmt.Fprintf(editor, "\n# Insert note here\n")
 		} else {
-			_, err = fmt.Fprintf(file, "\n%s\n", entry.Note)
+			_, err = fmt.Fprintf(editor, "\n%s\n", entry.Note)
 		}
 	}
 	if err != nil {
-		fatal("Could not write to tmp file: %s", err)
+		fatal("Could not write to editor: %s", err)
 	}
-	editor := os.Getenv("EDITOR")
-	if editor == "" {
-		fatal("No EDITOR env var configured.")
+	if err := editor.Run(); err != nil {
+		fatal("Failed to run editor %s: %s", editor.Command, err)
 	}
-
-	cmd := exec.Command("/bin/sh", "-c", editor+" '"+file.Name()+"'")
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fatal("Failed to run editor %s: %s", editor, err)
-	}
-	_, err = file.Seek(0, os.SEEK_SET)
-	if err != nil {
-		fatal("Failed to seek tmp file: %s", err)
-	}
-	editedEntry, err := readEntry(file)
+	editedEntry, err := readEntry(editor)
 	if err != nil {
 		fatal("%s", err)
 	}
@@ -95,6 +95,9 @@ func cmdTimeEditFn(c *Context) {
 	if err := c.Db.SaveTimeEntry(entry); err != nil {
 		fatal("Failed to save entry: %s", err)
 	}
+}
+
+func editEntries(c *Context, entries []*db.TimeEntry) {
 }
 
 type EditedEntry struct {
