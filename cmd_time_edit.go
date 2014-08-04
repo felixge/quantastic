@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"regexp"
@@ -98,6 +99,32 @@ func editEntry(c *Context, entry *db.TimeEntry) {
 }
 
 func editEntries(c *Context, entries []*db.TimeEntry) {
+	editor := NewEditor()
+	editor.TmpPrefix = "time-entries"
+	defer editor.Close()
+	table := [][]string{}
+	for _, entry := range entries {
+		row := []string{
+			TimeToString(&entry.Start),
+			", " + TimeToString(entry.End),
+			", " + CategoryToString(entry.Category),
+			", " + entry.Id,
+		}
+		table = append(table, row)
+	}
+	if err := writeTable(editor, table); err != nil {
+		fatal("Could not write to editor: %s", err)
+	}
+	if err := editor.Run(); err != nil {
+		fatal("Failed to run editor %s: %s", editor.Command, err)
+	}
+	editedEntries, err := readEntries(editor)
+	if err != nil {
+		fatal("Failed to read entries: %s", err)
+	}
+	for _, entry := range editedEntries {
+		fmt.Printf("entry: %#v\n", entry)
+	}
 }
 
 type EditedEntry struct {
@@ -144,4 +171,81 @@ func readEntry(r io.Reader) (*EditedEntry, error) {
 	}
 	entry.Note = strings.TrimSpace(entry.Note)
 	return entry, nil
+}
+
+func readEntries(r io.Reader) ([]*EditedEntry, error) {
+	type readState int
+	const (
+		argStart readState = iota + 1
+		argVal
+		argEnd
+		argQuoteVal
+		argQuoteEnd
+		rowEnd
+	)
+	var (
+		state = argStart
+		br    = bufio.NewReader(r)
+		arg   = bytes.NewBuffer(nil)
+		debug = bytes.NewBuffer(nil)
+		row   []string
+		rows  [][]string
+	)
+	for {
+		c, err := br.ReadByte()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+		debug.WriteByte(c)
+	statemachine:
+		switch state {
+		case argStart:
+			if c == '"' {
+				state = argQuoteVal
+			} else {
+				arg.WriteByte(c)
+				state = argVal
+			}
+		case argVal:
+			switch c {
+			case ' ':
+				state = argEnd
+				goto statemachine
+			case '\n':
+				state = rowEnd
+				goto statemachine
+			default:
+				arg.WriteByte(c)
+			}
+		case argEnd:
+			row = append(row, strings.TrimSpace(arg.String()))
+			arg.Reset()
+			state = argStart
+		case argQuoteVal:
+			if c == '"' {
+				state = argQuoteEnd
+			} else {
+				arg.WriteByte(c)
+			}
+		case argQuoteEnd:
+			switch c {
+			case ' ':
+				state = argEnd
+				goto statemachine
+			case '\n':
+				state = rowEnd
+				goto statemachine
+			default:
+				return nil, fmt.Errorf("Invalid character after quote: %s", debug)
+			}
+		case rowEnd:
+			fmt.Printf("row: %s\n", row)
+			rows = append(rows, row)
+			row = nil
+			state = argStart
+		}
+	}
+	return nil, nil
 }

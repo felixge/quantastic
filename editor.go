@@ -50,7 +50,12 @@ func (e *Editor) Write(b []byte) (int, error) {
 	if e.state != editorWrite {
 		return 0, fmt.Errorf("Editor is not writable.")
 	}
-	return e.tmpFile.Write(b)
+	if n, err := e.tmpFile.Write(b); err != nil {
+		e.err = err
+		return n, e.err
+	} else {
+		return n, nil
+	}
 }
 
 func (e *Editor) Read(b []byte) (int, error) {
@@ -60,7 +65,12 @@ func (e *Editor) Read(b []byte) (int, error) {
 	if e.state != editorRead {
 		return 0, fmt.Errorf("Editor is not readable.")
 	}
-	return e.tmpFile.Read(b)
+	if n, err := e.tmpFile.Read(b); err != nil {
+		e.err = err
+		return n, e.err
+	} else {
+		return n, nil
+	}
 }
 
 func (e *Editor) Run() error {
