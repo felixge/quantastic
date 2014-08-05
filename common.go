@@ -12,7 +12,7 @@ import (
 
 const (
 	categorySeparator = ":"
-	timeLayout        = "2006-01-02 15:04:05"
+	timeLayout        = "2006-01-02 15:04"
 	daybreakHour      = time.Hour * 3
 )
 
