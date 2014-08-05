@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"bytes"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"regexp"
@@ -78,17 +78,8 @@ func editEntry(c *Context, entry *db.TimeEntry) {
 	if err != nil {
 		fatal("%s", err)
 	}
-	entry.Category = StringToCategory(editedEntry.Category)
-	entry.Note = editedEntry.Note
-	if entry.Start, err = StringToTime(editedEntry.Start); err != nil {
-		fatal("Bad Start: %s", err)
-	}
-	if editedEntry.End == "" {
-		entry.End = nil
-	} else if t, err := StringToTime(editedEntry.End); err != nil {
-		fatal("Bad End: %s", err)
-	} else {
-		entry.End = &t
+	if err := applyEditedEntry(entry, editedEntry, true); err != nil {
+		fatal("%s", err)
 	}
 	if err := entry.Valid(); err != nil {
 		fatal("%s", err)
@@ -96,6 +87,28 @@ func editEntry(c *Context, entry *db.TimeEntry) {
 	if err := c.Db.SaveTimeEntry(entry); err != nil {
 		fatal("Failed to save entry: %s", err)
 	}
+}
+
+func applyEditedEntry(entry *db.TimeEntry, edited *EditedEntry, note bool) error {
+	start, err := StringToTime(edited.Start)
+	if err != nil {
+		return fmt.Errorf("Bad Start: %s", edited.Start)
+	}
+	entry.Start = start
+	if edited.End != "" {
+		end, err := StringToTime(edited.End)
+		if err != nil {
+			return fmt.Errorf("Bad End: %s", edited.End)
+		}
+		entry.End = &end
+	} else {
+		entry.End = nil
+	}
+	entry.Category = StringToCategory(edited.Category)
+	if note {
+		entry.Note = edited.Note
+	}
+	return nil
 }
 
 func editEntries(c *Context, entries []*db.TimeEntry) {
@@ -122,12 +135,56 @@ func editEntries(c *Context, entries []*db.TimeEntry) {
 	if err != nil {
 		fatal("Failed to read entries: %s", err)
 	}
-	for _, entry := range editedEntries {
-		fmt.Printf("entry: %#v\n", entry)
+	for _, editedEntry := range editedEntries {
+		found := false
+		for _, entry := range entries {
+			if entry.Id != editedEntry.Id {
+				continue
+			}
+			found = true
+			if err := applyEditedEntry(entry, editedEntry, false); err != nil {
+				fatal("%s", err)
+			}
+			if err := entry.Valid(); err != nil {
+				fatal("%s", err)
+			}
+			if err := c.Db.SaveTimeEntry(entry); err != nil {
+				fatal("Failed to save entry: %s", err)
+			}
+			break
+		}
+		if !found {
+			entry := &db.TimeEntry{}
+			if err := applyEditedEntry(entry, editedEntry, false); err != nil {
+				fatal("%s", err)
+			}
+			if err := entry.Valid(); err != nil {
+				fatal("%s", err)
+			}
+			if err := c.Db.SaveTimeEntry(entry); err != nil {
+				fatal("Failed to save entry: %s", err)
+			}
+		}
+	}
+	// Delete entries if they were removed
+	for _, entry := range entries {
+		found := false
+		for _, edited := range editedEntries {
+			if edited.Id == entry.Id {
+				found = true
+				break
+			}
+		}
+		if !found {
+			if err := c.Db.DeleteTimeEntry(entry.Id); err != nil {
+				fatal("%s", err)
+			}
+		}
 	}
 }
 
 type EditedEntry struct {
+	Id       string
 	Category string
 	Start    string
 	End      string
@@ -174,78 +231,28 @@ func readEntry(r io.Reader) (*EditedEntry, error) {
 }
 
 func readEntries(r io.Reader) ([]*EditedEntry, error) {
-	type readState int
-	const (
-		argStart readState = iota + 1
-		argVal
-		argEnd
-		argQuoteVal
-		argQuoteEnd
-		rowEnd
-	)
 	var (
-		state = argStart
-		br    = bufio.NewReader(r)
-		arg   = bytes.NewBuffer(nil)
-		debug = bytes.NewBuffer(nil)
-		row   []string
-		rows  [][]string
+		cr      = csv.NewReader(r)
+		entries []*EditedEntry
 	)
 	for {
-		c, err := br.ReadByte()
+		row, err := cr.Read()
 		if err == io.EOF {
-			break
+			return entries, nil
 		} else if err != nil {
 			return nil, err
 		}
-		debug.WriteByte(c)
-	statemachine:
-		switch state {
-		case argStart:
-			if c == '"' {
-				state = argQuoteVal
-			} else {
-				arg.WriteByte(c)
-				state = argVal
-			}
-		case argVal:
-			switch c {
-			case ' ':
-				state = argEnd
-				goto statemachine
-			case '\n':
-				state = rowEnd
-				goto statemachine
-			default:
-				arg.WriteByte(c)
-			}
-		case argEnd:
-			row = append(row, strings.TrimSpace(arg.String()))
-			arg.Reset()
-			state = argStart
-		case argQuoteVal:
-			if c == '"' {
-				state = argQuoteEnd
-			} else {
-				arg.WriteByte(c)
-			}
-		case argQuoteEnd:
-			switch c {
-			case ' ':
-				state = argEnd
-				goto statemachine
-			case '\n':
-				state = rowEnd
-				goto statemachine
-			default:
-				return nil, fmt.Errorf("Invalid character after quote: %s", debug)
-			}
-		case rowEnd:
-			fmt.Printf("row: %s\n", row)
-			rows = append(rows, row)
-			row = nil
-			state = argStart
+		if len(row) != 4 {
+			return nil, fmt.Errorf("Bad row: %s", strings.Join(row, ","))
 		}
+		for i, val := range row {
+			row[i] = strings.TrimSpace(val)
+		}
+		entries = append(entries, &EditedEntry{
+			Start:    row[0],
+			End:      row[1],
+			Category: row[2],
+			Id:       row[3],
+		})
 	}
-	return nil, nil
 }
