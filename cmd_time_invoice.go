@@ -33,7 +33,11 @@ func cmdTimeInvoiceFn(c *Context) {
 			fatal("Invalid month date: %s", err)
 		}
 	}
-	days := map[int]time.Duration{}
+	type InvoiceDay struct {
+		Duration time.Duration
+		Notes    string
+	}
+	days := map[int]InvoiceDay{}
 	for _, entry := range entries {
 		if !CategoryEqual(entry.Category, category) {
 			continue
@@ -41,65 +45,45 @@ func cmdTimeInvoiceFn(c *Context) {
 		if entry.Start.Year() != month.Year() || entry.Start.Month() != month.Month() {
 			continue
 		}
-		days[entry.Start.Day()] += entry.Duration()
+		invoiceDay := days[entry.Start.Day()]
+		invoiceDay.Duration += entry.Duration()
+		if entry.Note != "" {
+			invoiceDay.Notes += entry.Note + "\n"
+		}
+		days[entry.Start.Day()] = invoiceDay
 	}
 	table := asciitable.NewTable()
-	table.AddRow("Day", "Hours")
+	table.AddRow("Day", "Hours", "Total")
 	table.AddSeparator()
 	var total time.Duration
 	for day := 1; day <= daysInMonth(month); day++ {
 		dayTime := time.Date(month.Year(), month.Month(), day, 0, 0, 0, 0, time.Local)
-		duration := days[day]
-		//remainder := duration % (15 * time.Minute)
-		//duration -= remainder
-		//if remainder > 3*time.Minute {
-		//duration += 15 * time.Minute
-		//}
-		total += duration
+		invoiceDay := days[day]
+		total += invoiceDay.Duration
 		table.AddRow(
 			dayTime.Format("2006-01-02 (Mon)"),
-			DurationToString(duration),
+			DurationToString(invoiceDay.Duration),
+			DurationToString(total),
 		)
 	}
-	table.AddSeparator()
-	table.AddRow("Total", DurationToString(total))
-	fmt.Printf("%s\n", table)
-	//startStr := fmt.Sprintf("%04d-%02d-%02d", now.Year(), now.Month()-1, 1)
-	//firstDay, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", now.Year(), now.Month(), 1))
-	//if err != nil {
-	//fatal("Could not get first day of current month: %s", err)
-	//}
-	//num
-
-	//if err != nil {
-	//fatal("Could not get first day of next month: %s", err)
-	//}
-
-	//category := StringToCategory(c.Args[0])
-	//month := time.Now().Add(-time.Month)
-	//day := 1
-	//days := map[int]time.Duration{}
-	//daysInMonth := firstDayNextMonth.Add(-time.Hour).Day()
-	//for _, entry := range entries {
-	//if month != entry.Start.Month() {
-	//continue
-	//}
-	//if !CategoryEqual(category, entry.Category) {
-	//continue
-	//}
-	//days[entry.Start.Day()] += entry.Duration()
-	//}
-	//table := [][]string{{"DAY", "DURATION"}}
-	//for day := 1; day < daysInMonth; day++ {
-	//dayStr := fmt.Sprintf("%04d-%02d-%02d", mo)
-	//table = append(table, []string{dayStr, DurationToString(days[day])})
-	//}
-	//mustWriteTable(os.Stdout, table)
+	fmt.Printf("%s\n\n", table)
+	for day := 1; day <= daysInMonth(month); day++ {
+		dayTime := time.Date(month.Year(), month.Month(), day, 0, 0, 0, 0, time.Local)
+		invoiceDay := days[day]
+		if invoiceDay.Notes != "" {
+			fmt.Printf(
+				"%s - %s\n\n%s\n",
+				dayTime.Format("2006-01-02 (Mon)"),
+				DurationToString(invoiceDay.Duration),
+				prefixLines(invoiceDay.Notes, "    "),
+			)
+		}
+	}
 }
 
 func lastMonth() time.Time {
 	now := time.Now()
-	month := now.Month() - 1
+	month := now.Month()
 	if month == 0 {
 		month = 12
 	}
